@@ -79,6 +79,8 @@ async function reconcileNow(obj: Memcached) {
         let deployment:k8s.V1Deployment = response.body;
         deployment.metadata!.name= deploymentName;
         deployment.spec!.replicas = obj.spec.size;
+        //set our resource status.
+
         k8sApi.replaceNamespacedDeployment(deploymentName,namespace,deployment);
     } catch(err) {
         //Create the deployment
@@ -87,6 +89,7 @@ async function reconcileNow(obj: Memcached) {
         newDeployment.spec!.replicas = obj.spec.size;
         k8sApi.createNamespacedDeployment(namespace,newDeployment);
     } 
+    
 }
 
 interface MemcachedSpec {

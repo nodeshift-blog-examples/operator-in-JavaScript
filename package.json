@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc",
-    "watch": "npx tsc -w"
+    "watch": "npx tsc -w",
+    "clean": "rm -rf dist node_modules",
+    "start": "node dist/index.js"
   },
   "author": "",
   "license": "ISC",
