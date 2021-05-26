@@ -22,3 +22,20 @@ rules:
   - memcacheds/status
   verbs:
   - get
+- apiGroups:
+  - apps 
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - patch
+  - update
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/rollback
+  - deployments/scale
+  - replicasets
+  - replicasets/scale
+  - statefulsets
+  - statefulsets/scale

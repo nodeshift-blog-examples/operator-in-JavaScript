@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "4"
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"ts-operator:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"ts-operator\")].image"}]'
+    openshift.io/generated-by: OpenShiftNewApp
+  labels:
+    app: ts-operator
+    app.kubernetes.io/component: ts-operator
+    app.kubernetes.io/instance: ts-operator
+  name: ts-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: ts-operator
+  template:
+    metadata:
+      labels:
+        deployment: ts-operator
+    spec:
+      containers:
+      - env:
+        - name: DEV_MODE
+          value: "true"
+        image: quay.io/gradde/ts-operator@sha256:6955bdb4ef674d6e0e8cefa9a6894ce159b8ac6da1c9b1e9329037cfadad0050
+        imagePullPolicy: IfNotPresent
+        name: ts-operator
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      serviceAccount: ts-operator

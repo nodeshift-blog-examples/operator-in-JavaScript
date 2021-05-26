@@ -8,5 +8,5 @@ roleRef:
   name: memcached-editor-role
 subjects:
 - kind: ServiceAccount
-  name: default
-  namespace: system
+  name: ts-operator
+  namespace: guillaume-ts-operator
