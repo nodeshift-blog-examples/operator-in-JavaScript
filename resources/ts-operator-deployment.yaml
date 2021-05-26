@@ -23,7 +23,7 @@ spec:
       containers:
       - env:
         - name: DEV_MODE
-          value: "true"
+          value: "false"
         image: quay.io/gradde/ts-operator@sha256:6955bdb4ef674d6e0e8cefa9a6894ce159b8ac6da1c9b1e9329037cfadad0050
         imagePullPolicy: IfNotPresent
         name: ts-operator
