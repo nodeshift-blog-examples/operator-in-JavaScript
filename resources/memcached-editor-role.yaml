@@ -28,8 +28,11 @@ rules:
   - create
   - delete
   - deletecollection
+  - get
+  - list
   - patch
   - update
+  - watch
   resources:
   - daemonsets
   - deployments
