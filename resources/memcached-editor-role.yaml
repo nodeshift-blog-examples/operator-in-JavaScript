@@ -4,41 +4,41 @@ kind: ClusterRole
 metadata:
   name: memcached-editor-role
 rules:
-- apiGroups:
-  - cache.example.com
-  resources:
-  - memcacheds
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cache.example.com
-  resources:
-  - memcacheds/status
-  verbs:
-  - get
-- apiGroups:
-  - apps 
-  verbs:
-  - create
-  - delete
-  - deletecollection
-  - get
-  - list
-  - patch
-  - update
-  - watch
-  resources:
-  - daemonsets
-  - deployments
-  - deployments/rollback
-  - deployments/scale
-  - replicasets
-  - replicasets/scale
-  - statefulsets
-  - statefulsets/scale
+  - apiGroups:
+      - cache.example.com
+    resources:
+      - memcacheds
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - cache.example.com
+    resources:
+      - memcacheds/status
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    resources:
+      - daemonsets
+      - deployments
+      - deployments/rollback
+      - deployments/scale
+      - replicasets
+      - replicasets/scale
+      - statefulsets
+      - statefulsets/scale

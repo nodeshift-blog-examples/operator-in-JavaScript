@@ -7,6 +7,6 @@ roleRef:
   kind: ClusterRole
   name: memcached-editor-role
 subjects:
-- kind: ServiceAccount
-  name: ts-operator
-  namespace: guillaume-ts-operator
+  - kind: ServiceAccount
+    name: ts-operator
+    namespace: guillaume-ts-operator

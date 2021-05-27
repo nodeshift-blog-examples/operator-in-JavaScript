@@ -2,13 +2,13 @@
 
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -20,28 +20,28 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Build Image
-      id: build-image
-      uses: redhat-actions/buildah-build@v2
-      with:
-        image: ts-operator
-        tags: latest ${{ github.sha }}
-        dockerfiles: |
-          ./Dockerfile
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ts-operator
+          tags: latest ${{ github.sha }}
+          dockerfiles: |
+            ./Dockerfile
 
-    # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
-    # in which case 'username' and 'password' can be omitted.
-    - name: Push To quay.io
-      id: push-to-quay
-      uses: redhat-actions/push-to-registry@v2
-      with:
-        image: ${{ steps.build-image.outputs.image }}
-        tags: ${{ steps.build-image.outputs.tags }}
-        registry: quay.io/gradde
-        username: ${{ secrets.QUAY_LOGIN }}
-        password: ${{ secrets.QUAY_PASSWORD }}
+      # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
+      # in which case 'username' and 'password' can be omitted.
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/gradde
+          username: ${{ secrets.QUAY_LOGIN }}
+          password: ${{ secrets.QUAY_PASSWORD }}
 
-    - name: Print image url
-      run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
+      - name: Print image url
+        run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"

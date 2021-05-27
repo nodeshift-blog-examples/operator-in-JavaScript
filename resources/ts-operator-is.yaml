@@ -10,13 +10,13 @@ spec:
   lookupPolicy:
     local: false
   tags:
-  - annotations:
-      openshift.io/imported-from: quay.io/gradde/ts-operator:latest
-    from:
-      kind: DockerImage
-      name: quay.io/gradde/ts-operator:latest
-    generation: 3
-    importPolicy: {}
-    name: latest
-    referencePolicy:
-      type: Source
+    - annotations:
+        openshift.io/imported-from: quay.io/gradde/ts-operator:latest
+      from:
+        kind: DockerImage
+        name: quay.io/gradde/ts-operator:latest
+      generation: 3
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source

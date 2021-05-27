@@ -4,10 +4,10 @@ namespace: guillaume-ts-operator
 commonLabels:
   app: ts-operator
 resources:
-- ts-operator-namespace.yaml
-- ts-operator-sa.yaml
-- ts-operator-is.yaml
-- memcached-crd.yaml
-- memcached-editor-role.yaml
-- ts-operator-clusterrolebinding.yaml
-- ts-operator-deployment.yaml
+  - ts-operator-namespace.yaml
+  - ts-operator-sa.yaml
+  - ts-operator-is.yaml
+  - memcached-crd.yaml
+  - memcached-editor-role.yaml
+  - ts-operator-clusterrolebinding.yaml
+  - ts-operator-deployment.yaml

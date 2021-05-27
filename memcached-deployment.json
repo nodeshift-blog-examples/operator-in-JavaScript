@@ -1,43 +1,37 @@
 {
-    "apiVersion": "apps/v1",
-    "kind": "Deployment",
-    "metadata": {
-        "name": "clustered-memcached"
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "clustered-memcached"
+  },
+  "spec": {
+    "replicas": 3,
+    "selector": {
+      "matchLabels": {
+        "app": "memcached"
+      }
     },
-    "spec": {
-        "replicas": 3,
-        "selector": {
-            "matchLabels": {
-                "app": "memcached"
-            }
-        },
-        "template": {
-            "metadata": {
-                "labels": {
-                    "app": "memcached"
-                }
-            },
-            "spec": {
-                "containers": [
-                    {
-                        "command": [
-                            "memcached",
-                            "-m=64",
-                            "-o",
-                            "modern",
-                            "-v"
-                        ],
-                        "image": "docker.io/memcached:1.4.36-alpine",
-                        "name": "memcached",
-                        "ports": [
-                            {
-                                "containerPort": 11211,
-                                "protocol": "TCP"
-                            }
-                        ]
-                    }
-                ]
-            }
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "memcached"
         }
-    }    
+      },
+      "spec": {
+        "containers": [
+          {
+            "command": ["memcached", "-m=64", "-o", "modern", "-v"],
+            "image": "docker.io/memcached:1.4.36-alpine",
+            "name": "memcached",
+            "ports": [
+              {
+                "containerPort": 11211,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
 }

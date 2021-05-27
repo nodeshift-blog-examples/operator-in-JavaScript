@@ -48,7 +48,7 @@ spec:
                 size:
                   description: >-
                     The size of our Memcached cluster.
-                  type: number                
+                  type: number
       subresources:
         status: {}
       additionalPrinterColumns:

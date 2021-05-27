@@ -13,98 +13,100 @@ const deploymentTemplate = fs.readFileSync('memcached-deployment.json', 'utf-8')
 const watch = new k8s.Watch(kc);
 
 function loadKubeConfig(): k8s.KubeConfig {
-
-    const kubeConfig = new k8s.KubeConfig();
-    kubeConfig.loadFromDefault();
-    return kubeConfig;
+  const kubeConfig = new k8s.KubeConfig();
+  kubeConfig.loadFromDefault();
+  return kubeConfig;
 }
 
-function onEvent(phase: string, apiObj: any, watchObj?: any) {
-    log(`Received event in phase ${phase}.`);
-    if (phase == 'ADDED') {
-        reconcileInOneSecond(apiObj);
-    } else if (phase == 'MODIFIED') {
-        reconcileInOneSecond(apiObj);
-    } else if (phase == 'DELETED') {
+function onEvent(phase: string, apiObj: any) {
+  log(`Received event in phase ${phase}.`);
+  if (phase == 'ADDED') {
+    reconcileInOneSecond(apiObj);
+  } else if (phase == 'MODIFIED') {
+    reconcileInOneSecond(apiObj);
+  } else if (phase == 'DELETED') {
+    deleteResource(apiObj);
+  } else {
+    log(`Unknown event type: ${phase}`);
+  }
+}
 
-    } else {
-        log(`Unknown event type: ${phase}`);
-    }
+function deleteResource(obj: Memcached) {
+  log(`deleted ${obj}`);
 }
 
 function onDone(err: any) {
-    log(`Connection closed. ${err}`);
-    watchResource();
+  log(`Connection closed. ${err}`);
+  watchResource();
 }
 
 async function watchResource(): Promise<any> {
-    log('Watching API');
-    return watch.watch('/apis/cache.example.com/v1/memcacheds', {}, onEvent, onDone);
+  log('Watching API');
+  return watch.watch('/apis/cache.example.com/v1/memcacheds', {}, onEvent, onDone);
 }
 
 async function main() {
-    await watchResource()
-        .catch((req) => {
-            log(`Promise rejected: ${req}`);
-        })
-        .then((req) => {
-            log(`Promise resolved. ${req}`);
-            //setTimeout(startWatch, 15 * 1000);
-        })
-        .finally(() => {
-            log(`Promise finally.`);
-        })
-        ;
-    log(`Finished.`);
+  await watchResource()
+    .catch((req) => {
+      log(`Promise rejected: ${req}`);
+    })
+    .then((req) => {
+      log(`Promise resolved. ${req}`);
+      //setTimeout(startWatch, 15 * 1000);
+    })
+    .finally(() => {
+      log(`Promise finally.`);
+    });
+  log(`Finished.`);
 }
 
 function log(message: string) {
-    console.log(`${new Date().toLocaleString()}: ${message}`);
+  console.log(`${new Date().toLocaleString()}: ${message}`);
 }
 
 let reconcileScheduled = false;
 
 function reconcileInOneSecond(obj: Memcached) {
-    if (!reconcileScheduled) {
-        setTimeout(reconcileNow, 1000, obj);
-        reconcileScheduled = true;
-    }
+  if (!reconcileScheduled) {
+    setTimeout(reconcileNow, 1000, obj);
+    reconcileScheduled = true;
+  }
 }
 
 async function reconcileNow(obj: Memcached) {
-    reconcileScheduled = false;
-    const deploymentName: string = obj.metadata.name!;
-    //check if deployment exists. Create it if it doesn't.
-    try {
-        const response = await k8sApi.readNamespacedDeployment(deploymentName, namespace);
-        //patch the deployment
-        const deployment: k8s.V1Deployment = response.body;
-        deployment.metadata!.name = deploymentName;
-        deployment.spec!.replicas = obj.spec.size;
-        //set our resource status.
+  reconcileScheduled = false;
+  const deploymentName: string = obj.metadata.name!;
+  //check if deployment exists. Create it if it doesn't.
+  try {
+    const response = await k8sApi.readNamespacedDeployment(deploymentName, namespace);
+    //patch the deployment
+    const deployment: k8s.V1Deployment = response.body;
+    deployment.metadata!.name = deploymentName;
+    deployment.spec!.replicas = obj.spec.size;
+    //set our resource status as the latest reconcile date.
 
-        k8sApi.replaceNamespacedDeployment(deploymentName, namespace, deployment);
-    } catch (err) {
-        //Create the deployment
-        const newDeployment: k8s.V1Deployment = JSON.parse(deploymentTemplate);
-        newDeployment.metadata!.name = deploymentName;
-        newDeployment.spec!.replicas = obj.spec.size;
-        k8sApi.createNamespacedDeployment(namespace, newDeployment);
-    }
+    k8sApi.replaceNamespacedDeployment(deploymentName, namespace, deployment);
+  } catch (err) {
+    //Create the deployment
+    const newDeployment: k8s.V1Deployment = JSON.parse(deploymentTemplate);
+    newDeployment.metadata!.name = deploymentName;
+    newDeployment.spec!.replicas = obj.spec.size;
+    k8sApi.createNamespacedDeployment(namespace, newDeployment);
+  }
 }
 
 interface MemcachedSpec {
-    size: number;
+  size: number;
 }
 interface MemcachedStatus {
-    nodes: string[];
+  latestReconcile: string;
 }
 interface Memcached {
-    apiVersion: string;
-    kind: string;
-    metadata: k8s.V1ObjectMeta;
-    spec: MemcachedSpec;
-    status: MemcachedStatus;
+  apiVersion: string;
+  kind: string;
+  metadata: k8s.V1ObjectMeta;
+  spec: MemcachedSpec;
+  status: MemcachedStatus;
 }
 
 main();
