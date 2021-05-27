@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import * as k8s from '@kubernetes/client-node';
-import * as fs from 'fs';
+import * as k8s from "@kubernetes/client-node";
+import * as fs from "fs";
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 
 const kc = loadKubeConfig();
 const k8sApi = kc.makeApiClient(k8s.AppsV1Api);
 //TODO: Don't hardcode namespace name.
-const namespace = 'guillaume-ts-operator';
-const deploymentTemplate = fs.readFileSync('memcached-deployment.json', 'utf-8');
+const namespace = "guillaume-ts-operator";
+const deploymentTemplate = fs.readFileSync("memcached-deployment.json", "utf-8");
 const watch = new k8s.Watch(kc);
 
 function loadKubeConfig(): k8s.KubeConfig {
@@ -20,11 +20,11 @@ function loadKubeConfig(): k8s.KubeConfig {
 
 function onEvent(phase: string, apiObj: any) {
   log(`Received event in phase ${phase}.`);
-  if (phase == 'ADDED') {
+  if (phase == "ADDED") {
     reconcileInOneSecond(apiObj);
-  } else if (phase == 'MODIFIED') {
+  } else if (phase == "MODIFIED") {
     reconcileInOneSecond(apiObj);
-  } else if (phase == 'DELETED') {
+  } else if (phase == "DELETED") {
     deleteResource(apiObj);
   } else {
     log(`Unknown event type: ${phase}`);
@@ -41,8 +41,8 @@ function onDone(err: any) {
 }
 
 async function watchResource(): Promise<any> {
-  log('Watching API');
-  return watch.watch('/apis/cache.example.com/v1/memcacheds', {}, onEvent, onDone);
+  log("Watching API");
+  return watch.watch("/apis/cache.example.com/v1/memcacheds", {}, onEvent, onDone);
 }
 
 async function main() {
