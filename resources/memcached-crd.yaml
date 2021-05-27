@@ -49,6 +49,13 @@ spec:
                   description: >-
                     The size of our Memcached cluster.
                   type: number
+            status:
+              description: The status of this Memcached resource, set by the operator.
+              type: object
+              properties:
+                latestReconcile:
+                  description: The date/time of the last reconcile ran by the operator.
+                  type: string
       subresources:
         status: {}
       additionalPrinterColumns:

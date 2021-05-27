@@ -21,7 +21,13 @@ rules:
     resources:
       - memcacheds/status
     verbs:
+      - create
+      - delete
       - get
+      - list
+      - patch
+      - update
+      - watch
   - apiGroups:
       - apps
     verbs:

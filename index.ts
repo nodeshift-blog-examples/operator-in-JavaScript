@@ -3,10 +3,14 @@
 import * as k8s from "@kubernetes/client-node";
 import * as fs from "fs";
 
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+//process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+const MEMCACHED_GROUP = "cache.example.com";
+const MEMCACHED_VERSION = "v1";
+const MEMCACHED_PLURAL = "memcacheds";
 
 const kc = loadKubeConfig();
 const k8sApi = kc.makeApiClient(k8s.AppsV1Api);
+const k8sApiMC = kc.makeApiClient(k8s.CustomObjectsApi);
 //TODO: Don't hardcode namespace name.
 const namespace = "guillaume-ts-operator";
 const deploymentTemplate = fs.readFileSync("memcached-deployment.json", "utf-8");
@@ -33,6 +37,7 @@ function onEvent(phase: string, apiObj: any) {
 
 function deleteResource(obj: Memcached) {
   log(`deleted ${obj}`);
+  k8sApi.deleteNamespacedDeployment(obj.metadata.name!, namespace);
 }
 
 function onDone(err: any) {
@@ -82,17 +87,43 @@ async function reconcileNow(obj: Memcached) {
     //patch the deployment
     const deployment: k8s.V1Deployment = response.body;
     deployment.metadata!.name = deploymentName;
-    deployment.spec!.replicas = obj.spec.size;
-    //set our resource status as the latest reconcile date.
-
+    deployment.spec!.replicas = obj.spec!.size;
     k8sApi.replaceNamespacedDeployment(deploymentName, namespace, deployment);
   } catch (err) {
     //Create the deployment
     const newDeployment: k8s.V1Deployment = JSON.parse(deploymentTemplate);
     newDeployment.metadata!.name = deploymentName;
-    newDeployment.spec!.replicas = obj.spec.size;
+    newDeployment.spec!.replicas = obj.spec!.size;
     k8sApi.createNamespacedDeployment(namespace, newDeployment);
   }
+  //set our resource status as the latest reconcile date.
+  const status: Memcached = {
+    apiVersion: obj.apiVersion,
+    kind: obj.kind,
+    metadata: {
+      name: obj.metadata.name!,
+      resourceVersion: obj.metadata.resourceVersion,
+    },
+    status: {
+      latestReconcile: new Date().toLocaleString(),
+    },
+  };
+
+  k8sApiMC
+    .replaceNamespacedCustomObjectStatus(
+      MEMCACHED_GROUP,
+      MEMCACHED_VERSION,
+      namespace,
+      MEMCACHED_PLURAL,
+      obj.metadata.name!,
+      status,
+    )
+    .then((res) => {
+      log(`Status updated: ${res}`);
+    })
+    .catch((err) => {
+      log(`Updating Status failed: ${err.body.message}`);
+    });
 }
 
 interface MemcachedSpec {
@@ -105,8 +136,8 @@ interface Memcached {
   apiVersion: string;
   kind: string;
   metadata: k8s.V1ObjectMeta;
-  spec: MemcachedSpec;
-  status: MemcachedStatus;
+  spec?: MemcachedSpec;
+  status?: MemcachedStatus;
 }
 
 main();
