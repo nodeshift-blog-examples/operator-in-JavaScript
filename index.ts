@@ -13,7 +13,7 @@ const k8sApi = kc.makeApiClient(k8s.AppsV1Api);
 const k8sApiMC = kc.makeApiClient(k8s.CustomObjectsApi);
 const k8sApiPods = kc.makeApiClient(k8s.CoreV1Api);
 //TODO: Don't hardcode namespace name.
-const namespace = "guillaume-ts-operator";
+const namespace = "ts-operator";
 const deploymentTemplate = fs.readFileSync("memcached-deployment.json", "utf-8");
 const watch = new k8s.Watch(kc);
 
