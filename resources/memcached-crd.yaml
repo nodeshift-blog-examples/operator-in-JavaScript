@@ -53,9 +53,12 @@ spec:
               description: The status of this Memcached resource, set by the operator.
               type: object
               properties:
-                latestReconcile:
-                  description: The date/time of the last reconcile ran by the operator.
-                  type: string
+                pods:
+                  description: The list of pods created by the operator.
+                  type: array
+                  items:
+                    description: The name of a pod created by the operator.
+                    type: string
       subresources:
         status: {}
       additionalPrinterColumns:
