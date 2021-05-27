@@ -48,3 +48,16 @@ rules:
       - replicasets/scale
       - statefulsets
       - statefulsets/scale
+  - apiGroups:
+      - ''
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    resources:
+      - pods

@@ -129,15 +129,20 @@ async function reconcileNow(obj: Memcached) {
     });
 }
 async function getPodList(podSelector: string): Promise<string[]> {
-  const podList = await k8sApiPods.listNamespacedPod(
-    namespace,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    podSelector,
-  );
-  return podList.body.items.map((pod) => pod.metadata!.name!);
+  try {
+    const podList = await k8sApiPods.listNamespacedPod(
+      namespace,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      podSelector,
+    );
+    return podList.body.items.map((pod) => pod.metadata!.name!);
+  } catch (err) {
+    log(err);
+  }
+  return [];
 }
 
 interface MemcachedSpec {
