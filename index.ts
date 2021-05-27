@@ -7,12 +7,24 @@ import * as fs from "fs";
 const MEMCACHED_GROUP = "cache.example.com";
 const MEMCACHED_VERSION = "v1";
 const MEMCACHED_PLURAL = "memcacheds";
+interface MemcachedSpec {
+  size: number;
+}
+interface MemcachedStatus {
+  pods: string[];
+}
+interface Memcached {
+  apiVersion: string;
+  kind: string;
+  metadata: k8s.V1ObjectMeta;
+  spec?: MemcachedSpec;
+  status?: MemcachedStatus;
+}
 
 const kc = loadKubeConfig();
 const k8sApi = kc.makeApiClient(k8s.AppsV1Api);
 const k8sApiMC = kc.makeApiClient(k8s.CustomObjectsApi);
 const k8sApiPods = kc.makeApiClient(k8s.CoreV1Api);
-//TODO: Don't hardcode namespace name.
 const namespace = "ts-operator";
 const deploymentTemplate = fs.readFileSync("memcached-deployment.json", "utf-8");
 const watch = new k8s.Watch(kc);
@@ -51,25 +63,6 @@ async function watchResource(): Promise<any> {
   return watch.watch("/apis/cache.example.com/v1/memcacheds", {}, onEvent, onDone);
 }
 
-async function main() {
-  await watchResource()
-    .catch((req) => {
-      log(`Promise rejected: ${req}`);
-    })
-    .then((req) => {
-      log(`Promise resolved. ${req}`);
-      //setTimeout(startWatch, 15 * 1000);
-    })
-    .finally(() => {
-      log(`Promise finally.`);
-    });
-  log(`Finished.`);
-}
-
-function log(message: string) {
-  console.log(`${new Date().toLocaleString()}: ${message}`);
-}
-
 let reconcileScheduled = false;
 
 function reconcileInOneSecond(obj: Memcached) {
@@ -87,7 +80,6 @@ async function reconcileNow(obj: Memcached) {
     const response = await k8sApi.readNamespacedDeployment(deploymentName, namespace);
     //patch the deployment
     const deployment: k8s.V1Deployment = response.body;
-    deployment.metadata!.name = deploymentName;
     deployment.spec!.replicas = obj.spec!.size;
     k8sApi.replaceNamespacedDeployment(deploymentName, namespace, deployment);
   } catch (err) {
@@ -99,7 +91,7 @@ async function reconcileNow(obj: Memcached) {
     newDeployment.spec!.template!.metadata!.labels!["deployment"] = deploymentName;
     k8sApi.createNamespacedDeployment(namespace, newDeployment);
   }
-  //set our resource status as the latest reconcile date.
+  //set the status of our resource to the list of pod names.
   const status: Memcached = {
     apiVersion: obj.apiVersion,
     kind: obj.kind,
@@ -112,21 +104,14 @@ async function reconcileNow(obj: Memcached) {
     },
   };
 
-  k8sApiMC
-    .replaceNamespacedCustomObjectStatus(
-      MEMCACHED_GROUP,
-      MEMCACHED_VERSION,
-      namespace,
-      MEMCACHED_PLURAL,
-      obj.metadata.name!,
-      status,
-    )
-    .then((res) => {
-      log(`Status updated: ${JSON.stringify(res)}`);
-    })
-    .catch((err) => {
-      log(`Updating Status failed: ${err.body.message}`);
-    });
+  k8sApiMC.replaceNamespacedCustomObjectStatus(
+    MEMCACHED_GROUP,
+    MEMCACHED_VERSION,
+    namespace,
+    MEMCACHED_PLURAL,
+    obj.metadata.name!,
+    status,
+  );
 }
 async function getPodList(podSelector: string): Promise<string[]> {
   try {
@@ -145,18 +130,12 @@ async function getPodList(podSelector: string): Promise<string[]> {
   return [];
 }
 
-interface MemcachedSpec {
-  size: number;
+async function main() {
+  await watchResource();
 }
-interface MemcachedStatus {
-  pods: string[];
-}
-interface Memcached {
-  apiVersion: string;
-  kind: string;
-  metadata: k8s.V1ObjectMeta;
-  spec?: MemcachedSpec;
-  status?: MemcachedStatus;
+
+function log(message: string) {
+  console.log(`${new Date().toLocaleString()}: ${message}`);
 }
 
 main();
