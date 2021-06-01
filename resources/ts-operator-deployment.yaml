@@ -24,7 +24,7 @@ spec:
         - env:
             - name: DEV_MODE
               value: 'false'
-          image: quay.io/gradde/ts-operator@sha256:6955bdb4ef674d6e0e8cefa9a6894ce159b8ac6da1c9b1e9329037cfadad0050
+          image: quay.io/gradde/ts-operator:latest
           imagePullPolicy: IfNotPresent
           name: ts-operator
           ports:
