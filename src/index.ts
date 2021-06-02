@@ -21,19 +21,16 @@ interface Memcached {
   status?: MemcachedStatus;
 }
 
-const kc = loadKubeConfig();
+const kc = new k8s.KubeConfig();
+kc.loadFromDefault();
+
 const k8sApi = kc.makeApiClient(k8s.AppsV1Api);
 const k8sApiMC = kc.makeApiClient(k8s.CustomObjectsApi);
 const k8sApiPods = kc.makeApiClient(k8s.CoreV1Api);
+
 const namespace = "ts-operator";
 const deploymentTemplate = fs.readFileSync("memcached-deployment.json", "utf-8");
 const watch = new k8s.Watch(kc);
-
-function loadKubeConfig(): k8s.KubeConfig {
-  const kubeConfig = new k8s.KubeConfig();
-  kubeConfig.loadFromDefault();
-  return kubeConfig;
-}
 
 async function onEvent(phase: string, apiObj: any) {
   log(`Received event in phase ${phase}.`);
