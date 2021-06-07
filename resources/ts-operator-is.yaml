@@ -1,6 +1,8 @@
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
   labels:
     app: ts-operator
     app.kubernetes.io/component: ts-operator
@@ -9,14 +11,3 @@ metadata:
 spec:
   lookupPolicy:
     local: false
-  tags:
-    - annotations:
-        openshift.io/imported-from: quay.io/gradde/ts-operator:latest
-      from:
-        kind: DockerImage
-        name: quay.io/gradde/ts-operator:latest
-      generation: 3
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: Source

@@ -1,0 +1,21 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: ts-operator
+    app.kubernetes.io/component: ts-operator
+    app.kubernetes.io/instance: ts-operator
+  name: nodejs-14
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations:
+      openshift.io/imported-from: registry.access.redhat.com/ubi8/nodejs-14
+    from:
+      kind: DockerImage
+      name: registry.access.redhat.com/ubi8/nodejs-14
+    importPolicy: {}
+    name: latest
+    referencePolicy:
+      type: ""

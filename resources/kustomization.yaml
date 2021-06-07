@@ -7,7 +7,9 @@ resources:
   - ts-operator-namespace.yaml
   - ts-operator-sa.yaml
   - ts-operator-is.yaml
+  - nodejs-14-is.yaml
   - memcached-crd.yaml
   - memcached-editor-role.yaml
   - ts-operator-clusterrolebinding.yaml
   - ts-operator-deployment.yaml
+  - ts-operator-bc.yaml

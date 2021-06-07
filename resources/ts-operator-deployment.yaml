@@ -24,7 +24,7 @@ spec:
         - env:
             - name: DEV_MODE
               value: 'false'
-          image: quay.io/gradde/ts-operator:latest
+          image: ' '
           imagePullPolicy: IfNotPresent
           name: ts-operator
           ports:

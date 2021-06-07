@@ -1,0 +1,33 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: ts-operator
+    app.kubernetes.io/component: ts-operator
+    app.kubernetes.io/instance: ts-operator
+  name: ts-operator
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: ts-operator:latest
+  source:
+    git:
+      uri: https://github.com/guignome/ts-operator.git
+    type: Git
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: nodejs-14:latest
+    type: Docker
+  triggers:
+  - github:
+      secret: EPLDZNOvjYdZ9diDIlzM
+    type: GitHub
+  - generic:
+      secret: nfdzALnNkEP-kTTqA-5P
+    type: Generic
+  - type: ConfigChange
+  - imageChange: {}
+    type: ImageChange
