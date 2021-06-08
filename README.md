@@ -21,7 +21,7 @@ oc project ts-operator
 Tail the logs of the operator by running:
 
 ```bash
-oc logs -f deployment ts-operator
+oc logs -f deployment/ts-operator
 ```
 
 In a different terminal, create an instance of the CRD by running:
@@ -39,3 +39,11 @@ oc edit memcached memcached-sample
 ```
 
 Replace the size value from 2 to 4, then save. You will see the size of your deployment go from 2 to 4 and new pods starting.
+
+# Cleaning up
+
+You can delete all the resources created earlier by running
+
+```bash
+oc delete -k resources
+```
