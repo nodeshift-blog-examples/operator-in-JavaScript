@@ -13,7 +13,7 @@
     "lint-and-fix": "eslint . --ext .ts --fix"
   },
   "author": "",
-  "license": "See LICENSE file.",
+  "license": "Apache-2.0",
   "dependencies": {
     "@kubernetes/client-node": "^0.14.3",
     "typescript": "^4.2.4"
