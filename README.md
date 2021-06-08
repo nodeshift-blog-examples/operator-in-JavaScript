@@ -42,7 +42,7 @@ Replace the size value from 2 to 4, then save. You will see the size of your dep
 
 # Cleaning up
 
-You can delete all the resources created earlier by running
+You can delete all the resources created earlier by running:
 
 ```bash
 oc delete -k resources
